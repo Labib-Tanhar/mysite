@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atelier Agent</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand"><span class="brand-mark">✦</span><span>Atelier Agent</span></div>
+        <p class="eyebrow">BUSINESS OPERATING SYSTEM</p>
+        <nav>
+          <button class="nav-link active" data-view="dashboard">◈ <span>Dashboard</span></button>
+          <button class="nav-link" data-view="tasks">✓ <span>Tasks</span></button>
+          <button class="nav-link" data-view="memory">⌁ <span>Memory</span></button>
+          <button class="nav-link" data-view="settings">⚙ <span>Settings</span></button>
+        </nav>
+        <div class="sidebar-footer"><span class="status-dot"></span><span id="connection-label">Local mode</span></div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div><p class="eyebrow">SUNDAY · YOUR NEXT MOVE</p><h1 id="page-title">Command center</h1></div>
+          <div class="top-actions"><span class="streak">🔥 <b id="streak">0</b> day streak</span><button class="avatar">L</button></div>
+        </header>
+
+        <section id="view-dashboard" class="view active">
+          <div class="hero">
+            <div><span class="pill purple">AI CO-PILOT ONLINE</span><h2 id="greeting">Let's make today count.</h2><p id="agent-coaching">Connect your Firestore project, then ask me what deserves your attention.</p></div>
+            <button class="primary" id="ask-focus">✦ Find my next move</button>
+          </div>
+          <div class="metrics">
+            <article class="metric-card"><span>Completion rate</span><strong id="completion-rate">0%</strong><small id="completion-copy">No completed tasks yet</small><div class="progress"><i id="completion-progress"></i></div></article>
+            <article class="metric-card"><span>Active missions</span><strong id="active-count">0</strong><small>Tasks still in play</small><div class="spark"><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
+            <article class="metric-card"><span>Goal proximity</span><strong id="goal-rate">0%</strong><small id="goal-copy">Set a goal in Settings</small><div class="progress green"><i id="goal-progress"></i></div></article>
+          </div>
+          <div class="grid two">
+            <article class="panel"><div class="panel-head"><div><p class="eyebrow">AI PRIORITY QUEUE</p><h3>What should happen next?</h3></div><span class="pill dark" id="queue-time">—</span></div><div id="priority-queue" class="queue empty">Ask the agent to scan your work.</div></article>
+            <article class="panel"><div class="panel-head"><div><p class="eyebrow">MOMENTUM</p><h3>Weekly output</h3></div><span class="muted">Last 7 days</span></div><div id="bar-chart" class="bar-chart"></div></article>
+          </div>
+          <article class="panel chat-panel"><div class="panel-head"><div><p class="eyebrow">TALK TO YOUR COMPANION</p><h3>Agent console</h3></div><span class="pill green">Approval required</span></div><div id="chat-log" class="chat-log"><div class="bubble agent">I can scan your tasks and memory, recommend your next move, and prepare changes. I will always show the estimate and ask before creating or deleting anything.</div></div><form id="chat-form" class="chat-form"><input id="chat-input" autocomplete="off" placeholder="Tell me what you want to accomplish…" /><button class="primary">Send</button></form></article>
+        </section>
+
+        <section id="view-tasks" class="view"><div class="section-head"><div><p class="eyebrow">YOUR WORK</p><h2>Tasks</h2></div><button class="primary" id="new-task">+ New task</button></div><div id="task-list" class="task-list"></div></section>
+        <section id="view-memory" class="view"><div class="section-head"><div><p class="eyebrow">LONG-TERM CONTEXT</p><h2>Agent memory</h2></div></div><form id="memory-form" class="panel memory-form"><input id="memory-input" placeholder="e.g. I prefer calls before noon and I am targeting $10k this quarter" /><button class="primary">Remember</button></form><div id="memory-list" class="memory-list"></div></section>
+        <section id="view-settings" class="view"><div class="section-head"><div><p class="eyebrow">CONTROL PLANE</p><h2>Settings</h2></div></div><article class="panel settings-card"><p class="eyebrow">FIREBASE WEB CONFIG</p><p class="muted">Stored only in this browser. Use Firebase Auth and locked Firestore rules before production.</p><textarea id="firebase-config" rows="8" placeholder='{"apiKey":"…","authDomain":"…","projectId":"…","appId":"…"}'></textarea><div class="settings-row"><label>Goal target <input id="goal-target" type="number" min="1" value="10" /></label><label>Goal unit <input id="goal-unit" value="completed tasks" /></label></div><button class="primary" id="save-settings">Save settings</button><p id="settings-status" class="muted"></p></article><article class="panel"><p class="eyebrow">SERVER ENVIRONMENT</p><p class="muted">Set <code>NVIDIA_NIM_API_KEY</code> and optionally <code>NVIDIA_NIM_MODEL</code> on the server. Never place the NIM key in browser code.</p></article></section>
+      </main>
+    </div>
+    <div id="modal-root"></div>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
