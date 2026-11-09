@@ -141,7 +141,7 @@ button.lf-phone:hover{background:hsl(var(--muted))}
 .askbar:focus-within .inp{box-shadow:0 0 0 1px rgba(168,85,247,.55),0 0 36px rgba(168,85,247,.22)}
 .askbar .btn{position:absolute;right:.45rem;top:.45rem;width:2.2rem;height:2.2rem;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center}
 .chips{display:flex;gap:.5rem;justify-content:center;align-items:center;flex-wrap:wrap;margin:.9rem 0 1.6rem}.chips .btn-o{height:2rem;font-size:.8rem;border-radius:9999px}
-.conv{display:none;max-width:760px;margin:0 auto 1.4rem;padding:1rem;border:1px solid hsl(var(--border));border-radius:.8rem;background:hsl(var(--card)/.7);backdrop-filter:blur(10px)}.conv.open{display:block}.conv .hq-chat{height:300px}
+.conv{display:block;max-width:860px;margin:1.35rem auto 0;padding:0;border:1px solid hsl(var(--border));border-radius:1rem;background:linear-gradient(180deg,hsl(var(--card)/.92),hsl(var(--background)/.72));backdrop-filter:blur(16px);overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.24)}.conv .hq-chat{height:360px;padding:1.1rem 1.15rem}.conv:before{content:"Agent workspace";display:block;padding:.75rem 1rem;border-bottom:1px solid hsl(var(--border));font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;color:hsl(var(--muted-foreground));font-weight:600}.conv:not(.open){display:block}
 .home-g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1rem}.home-g>div{display:flex;min-width:0;animation:up .55s both}.home-g>div>.card{flex:1;min-width:0}
 .home-g>div:nth-child(2){animation-delay:.05s}.home-g>div:nth-child(3){animation-delay:.1s}.home-g>div:nth-child(4){animation-delay:.15s}.home-g>div:nth-child(n+5){animation-delay:.22s}
 @keyframes up{from{opacity:0;transform:translateY(12px)}}@keyframes dr{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}@keyframes rg{from{stroke-dashoffset:var(--c)}}
@@ -175,6 +175,8 @@ button.lf-phone:hover{background:hsl(var(--muted))}
 .fh{display:flex;align-items:center;gap:.6rem;padding:.8rem 1rem;border-bottom:1px solid hsl(var(--border))}.fin{display:flex;gap:.5rem;padding:.7rem;border-top:1px solid hsl(var(--border))}
 .hq-chat{scrollbar-width:thin;scrollbar-color:#3f3f46 transparent}.hq-chat::-webkit-scrollbar{width:6px}.hq-chat::-webkit-scrollbar-thumb{background:#3f3f46;border-radius:9px}
 .msg{line-height:1.5}.msg.u{background:linear-gradient(135deg,#7c3aed,#c026d3);color:#fff;border:0}.msg.n{align-self:center;background:none;border:0;font-size:.75rem;color:hsl(var(--muted-foreground));padding:.1rem}.msg b{font-weight:600}.conv .hq-chat{height:340px}
+.conv .msg{max-width:78%;padding:.72rem .9rem;border-radius:.85rem;font-size:.9rem}.conv .msg.u{border-bottom-right-radius:.25rem;background:#27272a;color:#fafafa;border:1px solid #3f3f46}.conv .msg.a{border-bottom-left-radius:.25rem;background:#18181b;border:1px solid #27272a}.conv .msg.n{max-width:100%;font-size:.7rem;letter-spacing:.02em}
+.agent-composer{max-width:860px;margin:.75rem auto 0;position:relative}.agent-composer .inp{height:3.35rem;border-radius:.85rem;padding:0 4rem 0 1rem;background:hsl(var(--card)/.9);border-color:#3f3f46}.agent-composer .btn{right:.45rem;top:.45rem;width:2.45rem;height:2.45rem;border-radius:.65rem}
 .wbar{display:flex;gap:2px;height:10px;border-radius:9999px;overflow:hidden;background:hsl(var(--muted))}.wbar i{display:block;min-width:3px}.wgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1rem;margin-top:1rem}
 .avatar.bell{right:0}
 .iv-g{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:1rem}@media(max-width:900px){.iv-g{grid-template-columns:1fr}}.iv-r{display:flex;gap:.4rem;margin-bottom:.4rem}
@@ -213,10 +215,10 @@ button.lf-phone:hover{background:hsl(var(--muted))}
   <button class="avatar bell" id="hqBell" aria-label="Notifications"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></svg><span class="dot" id="hqDot">0</span></button>
   <div class="notif" id="hqNotif"><div class="flex items-center justify-between mb-2"><b class="text-sm">Heat check 🔥</b><button class="btn-i" id="hqNX" aria-label="Close">×</button></div><div id="hqNB"></div><div class="flex gap-2 mt-3"><button class="btn h-8" id="hqEx">Explain myself</button><button class="btn-o h-8" id="hqNC">Scold me</button></div></div>
   <div class="hero"><h1><span id="hqHi">Assalamualaikum</span>, <span id="hqNm">Labib</span></h1><p class="text-sm shine" id="hqLine" title="Click for a fresh line">Warming up your day…</p></div>
-  <div class="askbar"><input id="hqIn" class="inp" autocomplete="off" placeholder="Ask your copilot, or tell it what happened…"><button class="btn" id="hqSend" aria-label="Send">↑</button></div>
+  <div class="conv open" id="hqConv"><div id="hqChat" class="hq-chat"></div></div>
+  <div class="askbar agent-composer"><input id="hqIn" class="inp" autocomplete="off" placeholder="Ask the agent to analyze, plan, or prepare a change…"><button class="btn" id="hqSend" aria-label="Send">↑</button></div>
   <div class="bar" id="hqBar" style="max-width:660px;margin:.7rem auto 0;opacity:0"><i></i></div>
   <div class="chips"><button class="btn-o" id="hqScan">⚡ Scan DB &amp; plan my day</button><button class="btn-o" id="hqRoast">🔥 Check me</button><button class="btn-o" id="hqChatT">💬 Conversation</button><span id="hqTimer" class="text-xs text-muted-foreground"></span></div>
-  <div class="conv" id="hqConv"><div id="hqChat" class="hq-chat"></div></div>
     <div class="home-g">
     <div id="cEm"></div><div id="cCa"></div><div id="cTd"></div><div id="cSc"></div>
     <div class="g-camp" id="cCamp"></div><div class="g-cnt" id="cCnt"></div><div class="g-todo" id="cTodo"></div>
@@ -1112,7 +1114,7 @@ const app=initializeApp({apiKey:"AIzaSyD-RszxOZQSiDvt_auJ5V3vPKLMsm8kiQg",authDo
 const db=getFirestore(app);
 window.db=db;window.taskCol=collection(db,'tasks');window.noteCol=collection(db,'notes');window.seqCol=collection(db,'sequences');window.clientCol=collection(db,'clients');window.leadCol=collection(db,'leads');window.fb={addDoc,updateDoc,deleteDoc,doc,setDoc,batch:()=>writeBatch(db)};
 const live=(col,field,pillId,okTxt,map,cb)=>onSnapshot(query(col,orderBy(field,'desc')),s=>{pill(pillId,true,okTxt);window.syncSet&&window.syncSet(pillId,'ok');cb(s.docs.map(map))},e=>{console.error(e);pill(pillId,false,'Sync error');window.syncSet&&window.syncSet(pillId,'err')});
-live(taskCol,'createdAt','tasksPill','Synced',d=>{const x=d.data();return{id:d.id,name:x.name,priority:x.priority,completed:!!x.completed,completedAt:x.completedAt&&x.completedAt.toDate?x.completedAt.toDate():null}},window.setTasksData);
+live(taskCol,'createdAt','tasksPill','Synced',d=>{const x=d.data();return{id:d.id,name:x.name,tag:x.tag||'',priority:x.priority,est:x.est,completed:!!x.completed,completedAt:x.completedAt&&x.completedAt.toDate?x.completedAt.toDate():null,createdAt:x.createdAt&&x.createdAt.toDate?x.createdAt.toDate():null}},window.setTasksData);
 live(noteCol,'createdAt','notesPill','Synced',d=>{const x=d.data();return{id:d.id,text:x.text||'',updatedAt:x.updatedAt&&x.updatedAt.toDate?x.updatedAt.toDate():null}},window.setNotesData);
 onSnapshot(doc(db,'mailboxes','main'),s=>window.setMailboxData(s.exists()?s.data():null),e=>window.setMailboxError(e));
 onSnapshot(query(window.clientCol,orderBy('createdAt','desc')),s=>window.setClientData(s.docs.map(d=>({id:d.id,...d.data()}))),e=>window.setClientError(e));
@@ -1163,6 +1165,7 @@ async function ask(label,prompt,scope){scope=scope||'hq';if(busy)return;if(!cfg(
    if(tc.function.name==='remember'&&a.fact)remember(a.fact,a.kind);if(['propose_changes','update_clients','update_campaign','configure_clock','configure_lead_search'].includes(tc.function.name)){pend={...a,_tool:tc.function.name}};if(tc.function.name==='draft_invoice'&&window.invFill){window.invFill(a);inv=1}}
   if(!txt)txt=pend?'I lined up some changes — check the popup.':inv?'Invoice drafted — check the preview and edit anything.':'👍';await say('a',txt,scope);endTimer(took,true);if(pend)openModal(pend)}
  catch(e){endTimer(0,false);toast(e.message)}busy=false}
+window.ask=ask;
 function remember(t,k){S.memory=[...(S.memory||[]),{t:String(t).slice(0,240),k:k||'fact',at:Date.now()}].slice(-60);saveS({memory:S.memory});drawMem()}
 /* ---------- approval popup ---------- */
 const nr=(k,label,o,fl)=>`<div class="mrow" style="flex-wrap:wrap"><input type="checkbox" checked data-${k}><span class="text-sm flex-1">${label}</span>${fl.map(([f,l,ty])=>`<label class="text-xs text-muted-foreground">${l} <input class="inp" style="width:${ty?'8.6rem':'4.8rem'};display:inline-flex" type="${ty||'number'}" data-${k}v="${f}" value="${A(o[f]??'')}"></label>`).join('')}</div>`;
@@ -1265,7 +1268,7 @@ V.addEventListener('mouseout',e=>{const o=e.target.closest&&e.target.closest('.o
 const send=()=>{const v=$('hqIn').value.trim();if(!v)return;$('hqIn').value='';ask(v)};$('hqSend').onclick=send;$('hqIn').addEventListener('keydown',e=>{if(e.key==='Enter')send()});
 $('hqScan').onclick=()=>ask('⚡ Scan my DB & plan my day','Scan my whole DB snapshot. 1) Name the ONE thing to do right now (exact task or follow-up name) and why. 2) Call out overdue follow-ups and anything slipping. 3) Use propose_changes: add funky-named tasks, delete stale or duplicate ones, and set today\'s email/follow-up/call challenge sized to my goal gap and difficulty. Give a short answer too.');
 $('hqRoast').onclick=()=>ask('🔥 Check me','Check-in. Compare today vs my targets given the time of day, overdue follow-ups and open tagged tasks. Scold or hype per your tone, then ask what blocked me if I am behind.');
-$('hqChatT').onclick=()=>{const c=$('hqConv');if(c.classList.contains('open')){c.classList.remove('open')}else openConv()};
+$('hqChatT').onclick=()=>{$('hqIn').focus();$('hqConv').scrollIntoView({behavior:'smooth',block:'center'})};
 $('hqBell').onclick=e=>{e.stopPropagation();$('hqNotif').classList.toggle('open')};$('hqNX').onclick=()=>$('hqNotif').classList.remove('open');$('hqNC').onclick=()=>{$('hqNotif').classList.remove('open');$('hqRoast').click()};
 document.addEventListener('click',e=>{if(!e.target.closest('#hqNotif,#hqBell'))$('hqNotif').classList.remove('open')});document.addEventListener('keydown',e=>{if(e.key==='Escape')$('hqNotif').classList.remove('open')});
 
@@ -1275,7 +1278,7 @@ document.querySelector('[data-view=hq]').addEventListener('click',()=>{sig='';se
 V.addEventListener('change',e=>{const w=e.target.dataset&&e.target.dataset.wl;if(w)saveS({workload:{[w]:+e.target.value||0}})});
 /* ---------- tags ---------- */
 window.aiTag=async(id,name)=>{if(!cfg().token)return;try{const m=await callAI([{role:'user',content:'Reply with ONE tag only (1-2 words, Title Case, no punctuation) that best suits this task for a solo web-design studio founder who does outreach, design and billing. Task: '+name}],{plain:1,max:12});const tag=(m.content||'').trim().replace(/[^\w &-]/g,'').slice(0,24);if(tag)await fb.updateDoc(fb.doc(db,'tasks',id),{tag})}catch(e){}};
-window.tagAll=async()=>{if(!cfg().token){toast('Add your access token in Settings');return}const L=tasks.filter(t=>!t.tag).slice(0,40);if(!L.length){toast('Every to-do already has a tag');return}toast('Tagging '+L.length+' to-dos…');try{const m=await callAI([{role:'user',content:'Give each task ONE tag (1-2 words, Title Case) that best suits it. Reply ONLY with JSON like {"<id>":"Tag"}.\n'+JSON.stringify(L.map(t=>({id:t.id,name:t.name})))}],{plain:1,max:700});const j=JSON.parse((m.content||'').replace(/```json|```/g,'').trim());for(const t of L)if(j[t.id])await fb.updateDoc(fb.doc(db,'tasks',t.id),{tag:String(j[t.id]).slice(0,24)});toast('Tags added')}catch(e){toast('Auto-tag failed: '+e.message)}};
+window.tagAll=async()=>{if(!cfg().token){toast('Add your access token in Settings');return}const L=tasks.filter(t=>!t.tag).slice(0,40);if(!L.length){toast('Every to-do already has a tag');return}toast('Tagging '+L.length+' to-dos…');try{const m=await callAI([{role:'user',content:'Give each task ONE tag (1-2 words, Title Case) that best suits it. Reply ONLY with JSON like {"<id>":"Tag"}.\n'+JSON.stringify(L.map(t=>({id:t.id,name:t.name})))}],{plain:1,max:700});const raw=(m.content||'').replace(/```(?:json)?/gi,'').replace(/```/g,'').trim(),j=JSON.parse(raw.slice(raw.indexOf('{'),raw.lastIndexOf('}')+1));const writes=L.filter(t=>j[t.id]).map(t=>fb.updateDoc(fb.doc(db,'tasks',t.id),{tag:String(j[t.id]).replace(/[^\w &-]/g,'').trim().slice(0,24)}));await Promise.all(writes);toast('Tags saved to Firestore')}catch(e){console.error(e);toast('Auto-tag failed: '+e.message)}};
 /* ---------- corner copilot ---------- */
 const VT={tasks:'To Do’s copilot',invoice:'Invoice copilot',clients:'Clients copilot',followups:'Campaign copilot',clock:'World Clock copilot',leads:'Lead Finder copilot'};
 function fabSync(){const v=cv(),on=FAB.includes(v);$('fab').style.display=on?'flex':'none';if(!on)$('fpanel').classList.remove('open');else $('fTitle').textContent=VT[v]||'Copilot'}
