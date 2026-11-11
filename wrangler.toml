@@ -1,0 +1,19 @@
+name = "atelier-mail"
+main = "worker/index.js"
+compatibility_date = "2026-11-11"
+
+[triggers]
+crons = ["*/5 * * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "atelier-mail"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+
+[vars]
+TOTAL_DAILY_CAP = "500"
+MAILBOX_DAILY_CAP = "20"
+SEND_PER_RUN = "10"
+SEND_WINDOW = "9-17"
+SEND_DAYS = "1,2,3,4,5"
+TZ_OFFSET_HOURS = "6"

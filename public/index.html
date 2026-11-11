@@ -281,7 +281,13 @@ button.lf-phone:hover{background:hsl(var(--muted))}
 
     <!-- FOLLOW-UPS -->
     <section class="view" id="view-followups">
-      <div class="mb-6 flex items-start justify-between gap-3"><div><h1 class="text-2xl font-semibold tracking-tight">Campaign</h1><p class="text-sm text-muted-foreground">Cold-email sequences on Day 1 · 3 · 7 · 14. Paste the file for each email, keep the plan, push every step to Google Calendar.</p></div><span class="badge-s" id="seqPill">Connecting…</span></div>
+      <div class="mb-6 flex items-start justify-between gap-3"><div><h1 class="text-2xl font-semibold tracking-tight">Campaigns &amp; reports</h1><p class="text-sm text-muted-foreground">Import leads, send through Microsoft 365 mailboxes, stop on replies, and monitor the whole funnel in one place.</p></div><div class="flex items-center gap-2"><button class="btn-o h-8" onclick="setMailToken()">Connect Microsoft</button><button class="btn-o h-8" id="mailRefresh">Refresh report</button><span class="badge-s" id="seqPill">Connecting…</span></div></div>
+      <div class="grid gap-4 sm:grid-cols-3 mb-4">
+        <div class="card"><div class="card-h"><div class="card-d">Emails sent</div></div><div class="card-c text-3xl font-semibold" id="mailSent">—</div></div>
+        <div class="card"><div class="card-h"><div class="card-d">Replies</div></div><div class="card-c text-3xl font-semibold" id="mailReplies">—</div></div>
+        <div class="card"><div class="card-h"><div class="card-d">Today / 500 cap</div></div><div class="card-c text-3xl font-semibold" id="mailCap">—</div></div>
+      </div>
+      <div class="card mb-4"><div class="card-h"><div class="card-t">Campaign performance</div><div class="card-d">Sent, follow-ups, replies, bounces and failures from Microsoft Graph.</div></div><div class="card-c"><div id="mailReport" class="overflow-x-auto text-sm"><span class="text-muted-foreground">Connect the mail backend to load reports.</span></div></div></div>
       <div class="card mb-4 hidden" id="seqBanner"><div class="card-c pt-4 flex flex-wrap items-center justify-between gap-3"><span class="text-sm text-red-400">Not syncing to Firebase. Follow-ups are only in this browser and can be lost.</span><button class="btn-o h-8" onclick="switchView('settings')">Fix in Settings</button></div></div>
       <div class="card mb-4"><div class="card-h"><div class="card-t">New sequence</div><div class="card-d">Day 1 is the day the first email goes out. The other steps count from it.</div></div><div class="card-c space-y-3">
         <input id="sCampaign" class="inp" maxlength="120" placeholder="Campaign Name">
@@ -924,9 +930,9 @@ const fmtD=d=>d.toLocaleDateString(undefined,{weekday:'short',month:'short',day:
 function normUrl(u){u=(u||'').trim();if(!u)return'';if(!/^https?:\/\//i.test(u))u='https://'+u;try{const x=new URL(u);return/^https?:$/.test(x.protocol)?x.href:''}catch(e){return''}}
 function stStatus(s,st){if(st.done)return{t:'Done',c:'badge-s',late:false};const n=dayDiff(stepDate(s,st));
   if(n<0)return{t:'Overdue · '+(-n)+'d',c:'badge-d',late:true};if(n===0)return{t:'Due today',c:'badge-p',late:false};return{t:n===1?'Tomorrow':'In '+n+'d',c:'badge-s',late:false}}
-function normSeq(id,x){return{id,campaignName:x.campaignName||x.lead||'Untitled campaign',audience:x.audience||x.company||'',contact:x.contact||'',lead:x.lead||x.campaignName||'',company:x.company||x.audience||'',start:x.start||ymd(new Date()),time:x.time||'10:00',plan:x.plan||'',
+function normSeq(id,x){return{id,campaignName:x.campaignName||x.lead||'Untitled campaign',audience:x.audience||x.company||'',contact:x.contact||'',lead:x.lead||x.campaignName||'',company:x.company||x.audience||'',start:x.start||ymd(new Date()),time:x.time||'10:00',plan:x.plan||'',recipients:x.recipients||'',sendFrom:x.sendFrom||'',
   steps:(Array.isArray(x.steps)&&x.steps.length?x.steps:DEF_STEPS.map(([day,label])=>({day,label}))).map(t=>({day:Math.max(1,+t.day||1),label:t.label||'',link:t.link||'',done:!!t.done,doneAt:t.doneAt||null}))}}
-const seqPayload=s=>({campaignName:s.campaignName||s.lead, audience:s.audience||s.company, lead:s.lead,company:s.company,contact:s.contact,start:s.start,time:s.time,plan:s.plan,steps:s.steps,updatedAt:new Date()});
+const seqPayload=s=>({campaignName:s.campaignName||s.lead, audience:s.audience||s.company, lead:s.lead,company:s.company,contact:s.contact,start:s.start,time:s.time,plan:s.plan,recipients:s.recipients||'',sendFrom:s.sendFrom||'',steps:s.steps,updatedAt:new Date()});
 function persistLocal(){try{localStorage.setItem(LS_KEY,JSON.stringify(seqs))}catch(e){toast('Could not save locally')}}
 function setMeta(id,t){const e=document.querySelector(`[data-sid="${id}"] [data-meta]`);if(e)e.textContent=t}
 function queueSave(id,delay=700){const s=seqs.find(x=>x.id===id);if(!s)return;seqPend.add(id);setMeta(id,'Saving…');clearTimeout(seqTimers[id]);seqTimers[id]=setTimeout(()=>flushSave(id),delay)}
@@ -980,6 +986,7 @@ function seqCard(s){const done=s.steps.filter(t=>t.done).length,total=s.steps.le
       <div class="space-y-2"><label class="lbl">Reminder time</label><input type="time" class="inp w-32" data-k="time" value="${A(s.time)}"></div>
       <button class="btn-o" data-act="ics">Download all as .ics</button><button class="btn-g text-red-400" data-act="del">Delete</button></div>
     <div class="sq-box">${s.steps.map((st,i)=>stepRow(s,st,i)).join('')}</div>
+    <div class="space-y-2"><label class="lbl">Recipients and mailbox routing</label><textarea class="inp" style="min-height:110px;resize:vertical" data-k="recipients" placeholder="CSV rows: email,name,company,mailbox&#10;lead@example.com,Ali,Acme,hello@labibatelier.com">${esc(s.recipients)}</textarea><input class="inp" data-k="sendFrom" value="${A(s.sendFrom)}" placeholder="Optional mailbox allow-list, comma-separated"><p class="sq-hint">CSV format: email, name, company, mailbox. Sending is capped at 20 per mailbox and 500 total per day.</p><div class="flex flex-wrap gap-2"><button class="btn-o h-8" data-act="csv">Import CSV</button><button class="btn h-8" data-act="launch">Launch sending</button><button class="btn-o h-8" data-act="stop">Stop unsent</button><span class="sq-hint" data-mail-status>Not launched.</span></div></div>
     <div class="space-y-2"><label class="lbl">Plan</label><textarea class="inp min-h-[110px] resize-y" data-k="plan" placeholder="What's the plan for this lead?">${esc(s.plan)}</textarea><p class="sq-hint">Edit anytime — the first lines of this plan go into every calendar event.</p></div>
   </div></div>`}
 function renderSeq(){const g=$('seqList');
@@ -1341,6 +1348,83 @@ $('ivList').addEventListener('click',async e=>{const p=e.target.closest('[data-i
 setInterval(()=>{if(!$('view-invoice').classList.contains('on'))return;const pk=$('ivPick'),sig2=clients.map(c=>c.id).join();if(pk.dataset.s!==sig2){pk.dataset.s=sig2;pk.innerHTML='<option value="">— pick a client —</option>'+clients.map(c=>`<option value="${c.id}">${esc(c.company||c.name||'Client')}</option>`).join('')}},1500);
 ivReset();
 fill();paint();drawChat();drawMem();
+</script>
+<script>
+/* Microsoft 365 campaign bridge. The token is intentionally entered locally and never stored in source. */
+(function(){
+  const MAIL_TOKEN_KEY='atelier-mail-token';
+  const mailToken=()=>localStorage.getItem(MAIL_TOKEN_KEY)||'';
+  const mailHeaders=()=>({'content-type':'application/json','x-atelier-token':mailToken()});
+  const mailApi=async(path,options={})=>{
+    if(!mailToken()) throw new Error('Add the Cloudflare mail token in Settings before launching.');
+    const r=await fetch(path,{...options,headers:{...mailHeaders(),...(options.headers||{})}});
+    const data=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(data.error||'Mail API request failed');
+    return data;
+  };
+  const rowsFromCsv=text=>{
+    const lines=String(text||'').split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
+    if(lines[0]&&/^email\s*,/i.test(lines[0])) lines.shift();
+    return lines.map(line=>{
+      const cells=line.split(',').map(x=>x.trim().replace(/^"(.*)"$/,'$1'));
+      return {email:cells[0]||'',name:cells[1]||'',company:cells[2]||'',mailbox:cells[3]||''};
+    }).filter(x=>x.email);
+  };
+  const csvText=s=>s.recipients||'';
+  const campaignSteps=(s,row)=>{
+    const base=Date.parse(`${s.start}T${s.time||'10:00'}:00`)||Date.now();
+    return s.steps.map((st,idx)=>({
+      idx,subject:idx===0?`${s.campaignName||'Hello'} — quick idea`:st.label||`Follow-up ${idx}`,
+      body:(s.plan||`Hi ${row.name||'there'},\n\nI wanted to follow up regarding ${s.campaignName||'this opportunity'}.`)+`\n\n— Labib Atelier`,
+      sendAt:base+Math.max(0,(+st.day||1)-1)*86400000
+    }));
+  };
+  async function launchMail(s,card){
+    const rows=rowsFromCsv(csvText(s));
+    if(!rows.length) throw new Error('Import at least one CSV row first.');
+    let count=0;
+    for(const row of rows){
+      if(!row.mailbox) throw new Error(`Missing mailbox for ${row.email}`);
+      const result=await mailApi('/api/mail/schedule',{method:'POST',body:JSON.stringify({
+        seqId:`${s.id}~${row.email.replace(/[^a-z0-9]/gi,'-').slice(0,60)}`,campaignId:s.id,campaignName:s.campaignName,
+        mailbox:row.mailbox,to:row.email,name:row.name,steps:campaignSteps(s,row)
+      })});
+      if(!result.skipped) count++;
+    }
+    const status=card.querySelector('[data-mail-status]');if(status)status.textContent=`${count} lead${count===1?'':'s'} queued`;
+    toast(`Queued ${count} lead${count===1?'':'s'} for Microsoft 365`);
+    loadMailReport();
+  }
+  async function stopMail(s,card){
+    await mailApi('/api/mail/cancel',{method:'POST',body:JSON.stringify({seqId:s.id})});
+    const status=card.querySelector('[data-mail-status]');if(status)status.textContent='Unsent steps cancelled';
+    toast('Unsent steps cancelled');
+  }
+  async function loadMailReport(){
+    try{
+      const r=await mailApi('/api/mail/report');
+      $('mailSent').textContent=r.totals?.sent??0;$('mailReplies').textContent=r.totals?.replied??0;
+      $('mailCap').textContent=`${r.today?.sent??0} / ${r.caps?.total??500}`;
+      const campaigns=r.campaigns||[];
+      $('mailReport').innerHTML=campaigns.length?`<table class="w-full"><thead><tr class="text-left text-muted-foreground"><th class="p-2">Campaign</th><th class="p-2">Sent</th><th class="p-2">Follow-ups</th><th class="p-2">Replies</th><th class="p-2">Queued</th><th class="p-2">Failures</th></tr></thead><tbody>${campaigns.map(x=>`<tr class="border-t"><td class="p-2">${esc(x.name||x.campaign_id)}</td><td class="p-2">${x.sent||0}</td><td class="p-2">${x.followups||0}</td><td class="p-2">${x.replied||0}</td><td class="p-2">${x.queued||0}</td><td class="p-2">${x.failed||0}</td></tr>`).join('')}</tbody></table>`:'<span class="text-muted-foreground">No mail activity yet.</span>';
+    }catch(e){$('mailReport').innerHTML=`<span class="text-red-400">${esc(e.message)}</span>`}
+  }
+  window.setMailToken=()=>{const token=prompt('Paste the ATELIER_TOKEN configured on Cloudflare Pages:');if(token){localStorage.setItem(MAIL_TOKEN_KEY,token.trim());toast('Mail connection saved locally');loadMailReport()}};
+  document.addEventListener('DOMContentLoaded',()=>{
+    const refresh=$('mailRefresh');if(refresh)refresh.onclick=loadMailReport;
+    const list=$('seqList');if(!list)return;
+    list.addEventListener('click',async e=>{
+      const b=e.target.closest('[data-act="csv"],[data-act="launch"],[data-act="stop"]');if(!b)return;
+      const card=b.closest('[data-sid]'),s=seqs.find(x=>x.id===card.dataset.sid);if(!s)return;
+      try{
+        if(b.dataset.act==='csv'){const input=document.createElement('input');input.type='file';input.accept='.csv,text/csv';input.onchange=()=>{const file=input.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{s.recipients=reader.result;const ta=card.querySelector('[data-k="recipients"]');if(ta)ta.value=s.recipients;queueSave(s.id,0);toast('CSV imported — review mailbox routing before launch')};reader.readAsText(file)};input.click()}
+        else if(b.dataset.act==='launch') await launchMail(s,card);
+        else await stopMail(s,card);
+      }catch(err){toast(err.message)}
+    });
+    loadMailReport();
+  });
+})();
 </script>
 
 <script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"9bce26e38aeb418ea98f1d36ecc3ee0c","r":1,"spa":2}' crossorigin="anonymous"></script>
